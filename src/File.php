@@ -2,7 +2,6 @@
 
 namespace TusPhp;
 
-use Carbon\Carbon;
 use TusPhp\Cache\Cacheable;
 use TusPhp\Exception\FileException;
 use TusPhp\Exception\ConnectionException;
@@ -281,7 +280,7 @@ class File
      */
     public function details(): array
     {
-        $now = Carbon::now();
+        $now = Datum::now();
 
         return [
             'name' => $this->name,

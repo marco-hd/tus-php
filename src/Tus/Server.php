@@ -3,7 +3,7 @@
 namespace TusPhp\Tus;
 
 use TusPhp\File;
-use Carbon\Carbon;
+use TusPhp\Datum;
 use TusPhp\Request;
 use TusPhp\Response;
 use Ramsey\Uuid\Uuid;
@@ -708,7 +708,7 @@ class Server extends AbstractTus
             return true;
         }
 
-        $isExpired = empty($contents['expires_at']) || Carbon::parse($contents['expires_at'])->lt(Carbon::now());
+        $isExpired = empty($contents['expires_at']) || Datum::fromRfc7231($contents['expires_at'])->isExpired();
 
         if ($isExpired && $contents['offset'] !== $contents['size']) {
             return true;

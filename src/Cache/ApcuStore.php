@@ -3,7 +3,7 @@
 namespace TusPhp\Cache;
 
 use APCUIterator;
-use Carbon\Carbon;
+use TusPhp\Datum;
 
 class ApcuStore extends AbstractCache
 {
@@ -22,7 +22,7 @@ class ApcuStore extends AbstractCache
             return $contents ?: null;
         }
 
-        $isExpired = Carbon::parse($contents['expires_at'])->lt(Carbon::now());
+        $isExpired = Datum::fromRfc7231($contents['expires_at'])->isExpired();
 
         return $isExpired ? null : $contents;
     }

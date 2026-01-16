@@ -2,7 +2,7 @@
 
 namespace TusPhp\Cache;
 
-use Carbon\Carbon;
+use TusPhp\Datum;
 use TusPhp\Config;
 use Predis\Client as RedisClient;
 
@@ -57,7 +57,7 @@ class RedisStore extends AbstractCache
             return null;
         }
 
-        $isExpired = Carbon::parse($contents['expires_at'])->lt(Carbon::now());
+        $isExpired = Datum::fromRfc7231($contents['expires_at'])->isExpired();
 
         return $isExpired ? null : $contents;
     }

@@ -3,7 +3,7 @@
 namespace TusPhp\Cache;
 
 use TusPhp\File;
-use Carbon\Carbon;
+use TusPhp\Datum;
 use TusPhp\Config;
 
 class FileStore extends AbstractCache
@@ -267,7 +267,7 @@ class FileStore extends AbstractCache
             return false;
         }
 
-        return Carbon::now() < Carbon::createFromFormat(self::RFC_7231, $meta['expires_at']);
+        return !Datum::fromRfc7231($meta['expires_at'])->isExpired();
     }
 
     /**

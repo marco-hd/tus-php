@@ -3,7 +3,7 @@
 namespace TusPhp\Tus;
 
 use TusPhp\File;
-use Carbon\Carbon;
+use TusPhp\Datum;
 use TusPhp\Config;
 use Ramsey\Uuid\Uuid;
 use TusPhp\Exception\TusException;
@@ -327,7 +327,8 @@ class Client extends AbstractTus
     {
         $expiresAt = $this->getCache()->get($this->getKey())['expires_at'] ?? null;
 
-        return empty($expiresAt) || Carbon::parse($expiresAt)->lt(Carbon::now());
+        return empty($expiresAt) || Datum::fromRfc7231($expiresAt)->isExpired();
+
     }
 
     /**
@@ -494,7 +495,7 @@ class Client extends AbstractTus
 
         $this->getCache()->set($this->getKey(), [
             'location' => $uploadLocation,
-            'expires_at' => Carbon::now()->addSeconds($this->getCache()->getTtl())->format($this->getCache()::RFC_7231),
+            'expires_at' => Datum::now()->addSeconds($this->getCache()->getTtl())->formatRfc7231(),
         ]);
 
         return [
