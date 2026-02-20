@@ -75,7 +75,7 @@ class RedisStore extends AbstractCache
             $contents[] = $value;
         }
 
-        $status = $this->redis->set($this->getPrefix() . $key, json_encode($contents));
+        $status = $this->redis->set($this->getPrefix() . $key, json_encode($contents), 'ex', $this->getTtl());
 
         return 'OK' === $status->getPayload();
     }
