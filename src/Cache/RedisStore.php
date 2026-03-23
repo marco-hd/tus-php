@@ -4,11 +4,10 @@ namespace TusPhp\Cache;
 
 use TusPhp\Datum;
 use TusPhp\Config;
-use Predis\Client as RedisClient;
 
 class RedisStore extends AbstractCache
 {
-    /** @var RedisClient */
+    /** @var \Predis\Client|\Redis */
     protected $redis;
 
     /**
@@ -20,17 +19,13 @@ class RedisStore extends AbstractCache
     {
         $options = empty($options) ? Config::get('redis') : $options;
 
-        $this->redis = new RedisClient($options);
-    }
-
-    /**
-     * Get redis.
-     *
-     * @return RedisClient
-     */
-    public function getRedis(): RedisClient
-    {
-        return $this->redis;
+        if (class_exists('\Redis')) {
+            $this->redis = new \Redis($options);
+        } elseif (class_exists('\Predis\Client')) {
+            $this->redis = new \Predis\Client($options);
+        } else {
+            throw new \LogicException('Redis extension not installed');
+        }
     }
 
     /**
@@ -45,7 +40,7 @@ class RedisStore extends AbstractCache
         }
 
         $contents = $this->redis->get($key);
-        if (null !== $contents) {
+        if (null !== $contents && false !== $contents) {
             $contents = json_decode($contents, true);
         }
 
@@ -75,9 +70,9 @@ class RedisStore extends AbstractCache
             $contents[] = $value;
         }
 
-        $status = $this->redis->set($this->getPrefix() . $key, json_encode($contents), 'ex', $this->getTtl());
+        $status = $this->redis->set($this->getPrefix() . $key, json_encode($contents), 'EX', $this->getTtl());
 
-        return 'OK' === $status->getPayload();
+        return ($status !== false);
     }
 
     /**
