@@ -20,7 +20,10 @@ class RedisStore extends AbstractCache
         $options = empty($options) ? Config::get('redis') : $options;
 
         if (class_exists('\Redis')) {
-            $this->redis = new \Redis($options);
+            $this->redis = new \Redis([
+                'host' => $options['host'],
+                'port' => $options['port'],
+            ]);
         } elseif (class_exists('\Predis\Client')) {
             $this->redis = new \Predis\Client($options);
         } else {
@@ -70,7 +73,7 @@ class RedisStore extends AbstractCache
             $contents[] = $value;
         }
 
-        $status = $this->redis->set($this->getPrefix() . $key, json_encode($contents), 'EX', $this->getTtl());
+        $status = $this->redis->setex($this->getPrefix() . $key, $this->getTtl(), json_encode($contents));
 
         return ($status !== false);
     }
