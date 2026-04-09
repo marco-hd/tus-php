@@ -22,7 +22,7 @@ class RedisStore extends AbstractCache
         if (class_exists('\Redis')) {
             $this->redis = new \Redis([
                 'host' => $options['host'],
-                'port' => $options['port'],
+                'port' => (int)$options['port'],
             ]);
         } elseif (class_exists('\Predis\Client')) {
             $this->redis = new \Predis\Client($options);
