@@ -317,6 +317,12 @@ class File
         try {
             $this->seek($output, $this->offset);
 
+            $cachePayload = [
+                'file_path' => $this->filePath,
+                'size'      => $this->fileSize,
+                'offset'    => $this->offset,
+            ];
+
             while ( ! feof($input)) {
                 if (CONNECTION_NORMAL !== connection_status()) {
                     throw new ConnectionException('Connection aborted by user.');
@@ -327,7 +333,8 @@ class File
 
                 $this->offset += $bytes;
 
-                $this->cache->set($key, ['offset' => $this->offset]);
+                $cachePayload['offset'] = $this->offset;
+                $this->cache->set($key, $cachePayload);
 
                 if ($this->offset > $totalBytes) {
                     throw new OutOfRangeException('The uploaded file is corrupt.');

@@ -51,7 +51,7 @@ class RedisStore extends AbstractCache
             return $contents;
         }
 
-        if ( ! $contents) {
+        if ( ! $contents || !isset($contents['expires_at'])) {
             return null;
         }
 
